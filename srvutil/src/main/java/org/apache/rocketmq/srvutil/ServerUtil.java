@@ -48,6 +48,7 @@ public class ServerUtil {
         try {
             commandLine = parser.parse(options, args);
             if (commandLine.hasOption('h')) {
+                // 打印帮助信息 关闭程序
                 hf.printHelp(appName, options, true);
                 System.exit(0);
             }

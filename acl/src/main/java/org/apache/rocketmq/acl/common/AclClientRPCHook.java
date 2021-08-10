@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.rocketmq.remoting.CommandCustomHeader;
 import org.apache.rocketmq.remoting.RPCHook;
 import org.apache.rocketmq.remoting.protocol.RemotingCommand;
@@ -28,10 +29,13 @@ import static org.apache.rocketmq.acl.common.SessionCredentials.ACCESS_KEY;
 import static org.apache.rocketmq.acl.common.SessionCredentials.SECURITY_TOKEN;
 import static org.apache.rocketmq.acl.common.SessionCredentials.SIGNATURE;
 
+/**
+ * 客户端rpc访问控制调用钩子实现
+ */
 public class AclClientRPCHook implements RPCHook {
+    /** 会话凭证 */
     private final SessionCredentials sessionCredentials;
-    protected ConcurrentHashMap<Class<? extends CommandCustomHeader>, Field[]> fieldCache =
-        new ConcurrentHashMap<Class<? extends CommandCustomHeader>, Field[]>();
+    protected ConcurrentHashMap<Class<? extends CommandCustomHeader>, Field[]> fieldCache = new ConcurrentHashMap<>();
 
     public AclClientRPCHook(SessionCredentials sessionCredentials) {
         this.sessionCredentials = sessionCredentials;
@@ -40,11 +44,11 @@ public class AclClientRPCHook implements RPCHook {
     @Override
     public void doBeforeRequest(String remoteAddr, RemotingCommand request) {
         byte[] total = AclUtils.combineRequestContent(request,
-            parseRequestContent(request, sessionCredentials.getAccessKey(), sessionCredentials.getSecurityToken()));
+                parseRequestContent(request, sessionCredentials.getAccessKey(), sessionCredentials.getSecurityToken()));
         String signature = AclUtils.calSignature(total, sessionCredentials.getSecretKey());
         request.addExtField(SIGNATURE, signature);
         request.addExtField(ACCESS_KEY, sessionCredentials.getAccessKey());
-        
+
         // The SecurityToken value is unneccessary,user can choose this one.
         if (sessionCredentials.getSecurityToken() != null) {
             request.addExtField(SECURITY_TOKEN, sessionCredentials.getSecurityToken());

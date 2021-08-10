@@ -18,6 +18,7 @@ package org.apache.rocketmq.common;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+
 import org.apache.rocketmq.common.annotation.ImportantField;
 import org.apache.rocketmq.common.constant.LoggerName;
 import org.apache.rocketmq.common.constant.PermName;
@@ -35,54 +36,89 @@ public class BrokerConfig {
     @ImportantField
     private String brokerIP1 = RemotingUtil.getLocalAddress();
     private String brokerIP2 = RemotingUtil.getLocalAddress();
+
+    /** broker名称 */
     @ImportantField
     private String brokerName = localHostName();
+
+    /** 集群名称 */
     @ImportantField
     private String brokerClusterName = "DefaultCluster";
+
+    /** brokerId */
     @ImportantField
     private long brokerId = MixAll.MASTER_ID;
+
+    /** 消息读/写权限 即发送和接收权限 */
     private int brokerPermission = PermName.PERM_READ | PermName.PERM_WRITE;
+
+    /** topic队列数 */
     private int defaultTopicQueueNums = 8;
+
+    /** 是否自动创建topic */
     @ImportantField
     private boolean autoCreateTopicEnable = true;
 
+    /** 是否开启topic集群 */
     private boolean clusterTopicEnable = true;
 
+    /** broker topic启动? */
     private boolean brokerTopicEnable = true;
+
+    /** 自动创建订阅组 */
     @ImportantField
     private boolean autoCreateSubscriptionGroup = true;
+
+    /** 消息存储插件?? 还有这东西 */
     private String messageStorePlugIn = "";
+
+    /** 消息追踪topic名称 */
     @ImportantField
     private String msgTraceTopicName = TopicValidator.RMQ_SYS_TRACE_TOPIC;
+
+    /** 是否启动消息追踪 */
     @ImportantField
     private boolean traceTopicEnable = false;
     /**
      * thread numbers for send message thread pool, since spin lock will be used by default since 4.0.x, the default
      * value is 1.
+     * 因为4.0.x默认开启自旋锁, 所以默认发送消息的线程池大小默认为1 不知道为啥
      */
     private int sendMessageThreadPoolNums = 1; //16 + Runtime.getRuntime().availableProcessors() * 4;
+    /** 推送消息线程池大小 */
     private int pullMessageThreadPoolNums = 16 + Runtime.getRuntime().availableProcessors() * 2;
+    /** 处理重发消息线程池大小 */
     private int processReplyMessageThreadPoolNums = 16 + Runtime.getRuntime().availableProcessors() * 2;
+    /** 查询消息线程池大小 */
     private int queryMessageThreadPoolNums = 8 + Runtime.getRuntime().availableProcessors();
-
+    /** 管理员 broker线程池大小 */
     private int adminBrokerThreadPoolNums = 16;
+    /** 客户端线程池大小 */
     private int clientManageThreadPoolNums = 32;
+    /** 消费者线程池大小 */
     private int consumerManageThreadPoolNums = 32;
+    /** 心跳包线程池大爱小 */
     private int heartbeatThreadPoolNums = Math.min(32, Runtime.getRuntime().availableProcessors());
 
     /**
-     * Thread numbers for EndTransactionProcessor
+     * Thread numbers for EndTransactionProcessor 事务处理线程池
      */
     private int endTransactionThreadPoolNums = 8 + Runtime.getRuntime().availableProcessors() * 2;
 
+    /** 消费数据偏移量 刷盘间隔 */
     private int flushConsumerOffsetInterval = 1000 * 5;
-
+    /** 历史数据偏移量 刷盘间隔*/
     private int flushConsumerOffsetHistoryInterval = 1000 * 60;
 
+    /** 拒绝事务消息 */
     @ImportantField
     private boolean rejectTransactionMessage = false;
+
+    /** 通过nameserv获取服务地址 */
     @ImportantField
     private boolean fetchNamesrvAddrByAddressServer = false;
+
+    /** 各种线程池容量大小 */
     private int sendThreadPoolQueueCapacity = 10000;
     private int pullThreadPoolQueueCapacity = 100000;
     private int replyThreadPoolQueueCapacity = 10000;
@@ -94,6 +130,7 @@ public class BrokerConfig {
 
     private int filterServerNums = 0;
 
+    /**  */
     private boolean longPollingEnable = true;
 
     private long shortPollingTimeMills = 1000;

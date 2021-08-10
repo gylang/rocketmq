@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
 import org.apache.rocketmq.acl.AccessResource;
 import org.apache.rocketmq.acl.AccessValidator;
 import org.apache.rocketmq.acl.common.AclException;
@@ -40,6 +41,9 @@ import org.apache.rocketmq.remoting.protocol.RemotingCommand;
 
 import static org.apache.rocketmq.acl.plain.PlainAccessResource.getRetryTopic;
 
+/**
+ * 请求校验
+ */
 public class PlainAccessValidator implements AccessValidator {
 
     private PlainPermissionManager aclPlugEngine;
@@ -88,9 +92,12 @@ public class PlainAccessValidator implements AccessValidator {
                     accessResource.addResourceAndPerm(request.getExtFields().get("topic"), Permission.SUB);
                     break;
                 case RequestCode.HEART_BEAT:
+                    // 心跳数据
                     HeartbeatData heartbeatData = HeartbeatData.decode(request.getBody(), HeartbeatData.class);
+                    // 消费者 ->对应多个订阅
                     for (ConsumerData data : heartbeatData.getConsumerDataSet()) {
                         accessResource.addResourceAndPerm(getRetryTopic(data.getGroupName()), Permission.SUB);
+                        // 订阅者
                         for (SubscriptionData subscriptionData : data.getSubscriptionDataSet()) {
                             accessResource.addResourceAndPerm(subscriptionData.getTopic(), Permission.SUB);
                         }
@@ -98,20 +105,20 @@ public class PlainAccessValidator implements AccessValidator {
                     break;
                 case RequestCode.UNREGISTER_CLIENT:
                     final UnregisterClientRequestHeader unregisterClientRequestHeader =
-                        (UnregisterClientRequestHeader) request
-                            .decodeCommandCustomHeader(UnregisterClientRequestHeader.class);
+                            (UnregisterClientRequestHeader) request
+                                    .decodeCommandCustomHeader(UnregisterClientRequestHeader.class);
                     accessResource.addResourceAndPerm(getRetryTopic(unregisterClientRequestHeader.getConsumerGroup()), Permission.SUB);
                     break;
                 case RequestCode.GET_CONSUMER_LIST_BY_GROUP:
                     final GetConsumerListByGroupRequestHeader getConsumerListByGroupRequestHeader =
-                        (GetConsumerListByGroupRequestHeader) request
-                            .decodeCommandCustomHeader(GetConsumerListByGroupRequestHeader.class);
+                            (GetConsumerListByGroupRequestHeader) request
+                                    .decodeCommandCustomHeader(GetConsumerListByGroupRequestHeader.class);
                     accessResource.addResourceAndPerm(getRetryTopic(getConsumerListByGroupRequestHeader.getConsumerGroup()), Permission.SUB);
                     break;
                 case RequestCode.UPDATE_CONSUMER_OFFSET:
                     final UpdateConsumerOffsetRequestHeader updateConsumerOffsetRequestHeader =
-                        (UpdateConsumerOffsetRequestHeader) request
-                            .decodeCommandCustomHeader(UpdateConsumerOffsetRequestHeader.class);
+                            (UpdateConsumerOffsetRequestHeader) request
+                                    .decodeCommandCustomHeader(UpdateConsumerOffsetRequestHeader.class);
                     accessResource.addResourceAndPerm(getRetryTopic(updateConsumerOffsetRequestHeader.getConsumerGroup()), Permission.SUB);
                     accessResource.addResourceAndPerm(updateConsumerOffsetRequestHeader.getTopic(), Permission.SUB);
                     break;
@@ -150,15 +157,18 @@ public class PlainAccessValidator implements AccessValidator {
         return aclPlugEngine.deleteAccessConfig(accesskey);
     }
 
-    @Override public String getAclConfigVersion() {
+    @Override
+    public String getAclConfigVersion() {
         return aclPlugEngine.getAclConfigDataVersion();
     }
 
-    @Override public boolean updateGlobalWhiteAddrsConfig(List<String> globalWhiteAddrsList) {
+    @Override
+    public boolean updateGlobalWhiteAddrsConfig(List<String> globalWhiteAddrsList) {
         return aclPlugEngine.updateGlobalWhiteAddrsConfig(globalWhiteAddrsList);
     }
 
-    @Override public AclConfig getAllAclConfig() {
+    @Override
+    public AclConfig getAllAclConfig() {
         return aclPlugEngine.getAllAclConfig();
     }
 }

@@ -66,14 +66,15 @@ import org.apache.rocketmq.store.stats.BrokerStatsManager;
 public class DefaultMessageStore implements MessageStore {
     private static final InternalLogger log = InternalLoggerFactory.getLogger(LoggerName.STORE_LOGGER_NAME);
 
+    /** 消息存储配置 */
     private final MessageStoreConfig messageStoreConfig;
-    // CommitLog
+    /** 提交记录 */
     private final CommitLog commitLog;
 
     private final ConcurrentMap<String/* topic */, ConcurrentMap<Integer/* queueId */, ConsumeQueue>> consumeQueueTable;
-
+    /** 消费队列刷盘 */
     private final FlushConsumeQueueService flushConsumeQueueService;
-
+    /** 清理提交记录 */
     private final CleanCommitLogService cleanCommitLogService;
 
     private final CleanConsumeQueueService cleanConsumeQueueService;

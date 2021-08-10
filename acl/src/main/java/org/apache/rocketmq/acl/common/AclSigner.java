@@ -19,6 +19,7 @@ package org.apache.rocketmq.acl.common;
 import java.nio.charset.Charset;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.rocketmq.common.constant.LoggerName;
 import org.apache.rocketmq.logging.InternalLogger;
@@ -31,17 +32,42 @@ public class AclSigner {
     private static final int CAL_SIGNATURE_FAILED = 10015;
     private static final String CAL_SIGNATURE_FAILED_MSG = "[%s:signature-failed] unable to calculate a request signature. error=%s";
 
+    /**
+     * 加签 默认算法 hmac Sha1 字节集 utf8
+     * @param data 数据
+     * @param key 没有
+     * @return base64字符串
+     * @throws AclException
+     */
     public static String calSignature(String data, String key) throws AclException {
         return calSignature(data, key, DEFAULT_ALGORITHM, DEFAULT_CHARSET);
     }
-
+    /**
+     * 加签
+     * @param data 数据
+     * @param key 没有
+     * @param algorithm 加签算法
+     * @param charset 字节集
+     * @return base64字符串
+     * @throws AclException
+     */
     public static String calSignature(String data, String key, SigningAlgorithm algorithm,
-        Charset charset) throws AclException {
+                                      Charset charset) throws AclException {
         return signAndBase64Encode(data, key, algorithm, charset);
     }
 
+    /**
+     * 加签
+     *
+     * @param data      数据
+     * @param key       没有
+     * @param algorithm 加签算法
+     * @param charset   字节集
+     * @return base64字符串
+     * @throws AclException
+     */
     private static String signAndBase64Encode(String data, String key, SigningAlgorithm algorithm, Charset charset)
-        throws AclException {
+            throws AclException {
         try {
             byte[] signature = sign(data.getBytes(charset), key.getBytes(charset), algorithm);
             return new String(Base64.encodeBase64(signature), DEFAULT_CHARSET);
@@ -52,6 +78,15 @@ public class AclSigner {
         }
     }
 
+    /**
+     * 加签
+     *
+     * @param data      数据
+     * @param key       没有
+     * @param algorithm 加签算法
+     * @return bytes
+     * @throws AclException
+     */
     private static byte[] sign(byte[] data, byte[] key, SigningAlgorithm algorithm) throws AclException {
         try {
             Mac mac = Mac.getInstance(algorithm.toString());
@@ -64,17 +99,41 @@ public class AclSigner {
         }
     }
 
+    /**
+     * 加签 默认算法 hmac Sha1 字节集 utf8
+     * @param data 数据
+     * @param key 没有
+     * @return base64字符串
+     * @throws AclException
+     */
     public static String calSignature(byte[] data, String key) throws AclException {
         return calSignature(data, key, DEFAULT_ALGORITHM, DEFAULT_CHARSET);
     }
-
+    /**
+     * 加签
+     * @param data 数据
+     * @param key 没有
+     * @param algorithm 加签算法
+     * @param charset 字节集
+     * @return base64字符串
+     * @throws AclException
+     */
     public static String calSignature(byte[] data, String key, SigningAlgorithm algorithm,
-        Charset charset) throws AclException {
+                                      Charset charset) throws AclException {
         return signAndBase64Encode(data, key, algorithm, charset);
     }
 
+    /**
+     * 加签
+     * @param data 数据
+     * @param key 没有
+     * @param algorithm 加签算法
+     * @param charset 字节集
+     * @return base64字符串
+     * @throws AclException
+     */
     private static String signAndBase64Encode(byte[] data, String key, SigningAlgorithm algorithm, Charset charset)
-        throws AclException {
+            throws AclException {
         try {
             byte[] signature = sign(data, key.getBytes(charset), algorithm);
             return new String(Base64.encodeBase64(signature), DEFAULT_CHARSET);

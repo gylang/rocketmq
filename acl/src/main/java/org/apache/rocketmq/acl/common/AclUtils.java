@@ -17,6 +17,7 @@
 package org.apache.rocketmq.acl.common;
 
 import com.alibaba.fastjson.JSONObject;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -26,6 +27,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.SortedMap;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.common.constant.LoggerName;
 import org.apache.rocketmq.logging.InternalLogger;
@@ -40,6 +42,13 @@ public class AclUtils {
 
     private static final InternalLogger log = InternalLoggerFactory.getLogger(LoggerName.COMMON_LOGGER_NAME);
 
+    /**
+     * 联合请求数据 格式 (value1+value2+value2...valueN + body).toBytes()
+     *
+     * @param request
+     * @param fieldsMap
+     * @return
+     */
     public static byte[] combineRequestContent(RemotingCommand request, SortedMap<String, String> fieldsMap) {
         try {
             StringBuilder sb = new StringBuilder("");
@@ -55,6 +64,13 @@ public class AclUtils {
         }
     }
 
+    /**
+     * bye数组联合 (尾部追加)
+     *
+     * @param b1
+     * @param b2
+     * @return
+     */
     public static byte[] combineBytes(byte[] b1, byte[] b2) {
         int size = (null != b1 ? b1.length : 0) + (null != b2 ? b2.length : 0);
         byte[] total = new byte[size];
@@ -65,11 +81,23 @@ public class AclUtils {
         return total;
     }
 
+    /**
+     * 加签
+     *
+     * @param data
+     * @param secretKey
+     * @return
+     */
     public static String calSignature(byte[] data, String secretKey) {
         String signature = AclSigner.calSignature(data, secretKey);
         return signature;
     }
 
+    /**
+     * ipv6地址校验
+     *
+     * @param netaddress
+     */
     public static void IPv6AddressCheck(String netaddress) {
         if (isAsterisk(netaddress) || isMinus(netaddress)) {
             int asterisk = netaddress.indexOf("*");
@@ -94,6 +122,12 @@ public class AclUtils {
         }
     }
 
+    /**
+     * ipv6地址处理 (不知道处理啥, 可能是填充完整,ipv6会压缩)
+     *
+     * @param netaddress
+     * @return
+     */
     public static String v6ipProcess(String netaddress) {
         int part;
         String subAddress;
@@ -114,12 +148,26 @@ public class AclUtils {
         return expandIP(subAddress, part);
     }
 
+
+    /**
+     * 校验v4 v6地址是否合法
+     *
+     * @param netaddress
+     * @param index
+     */
     public static void verify(String netaddress, int index) {
         if (!AclUtils.isScope(netaddress, index)) {
             throw new AclException(String.format("Netaddress examine scope Exception netaddress is %s", netaddress));
         }
     }
 
+    /**
+     * 获取地址
+     *
+     * @param netaddress
+     * @param partialAddress
+     * @return
+     */
     public static String[] getAddresses(String netaddress, String partialAddress) {
         String[] parAddStrArray = StringUtils.split(partialAddress.substring(1, partialAddress.length() - 1), ",");
         String address = netaddress.substring(0, netaddress.indexOf("{"));
@@ -130,6 +178,12 @@ public class AclUtils {
         return addreeStrArray;
     }
 
+    /**
+     * 校验v4 v6地址是否合法
+     *
+     * @param netaddress
+     * @param index
+     */
     public static boolean isScope(String netaddress, int index) {
 //        IPv6 Address
         if (isColon(netaddress)) {
@@ -146,6 +200,12 @@ public class AclUtils {
 
     }
 
+    /**
+     * 校验v4
+     *
+     * @param num
+     * @param index
+     */
     public static boolean isScope(String[] num, int index) {
         if (num.length <= index) {
 
@@ -266,6 +326,14 @@ public class AclUtils {
         return sb.toString().toUpperCase();
     }
 
+    /**
+     * yaml转对象
+     *
+     * @param path  yaml路径节点
+     * @param clazz 对象类型
+     * @param <T>
+     * @return
+     */
     public static <T> T getYamlDataObject(String path, Class<T> clazz) {
         Yaml yaml = new Yaml();
         FileInputStream fis = null;
@@ -286,6 +354,13 @@ public class AclUtils {
         }
     }
 
+    /**
+     * 将map写入yaml
+     *
+     * @param path
+     * @param dataMap
+     * @return
+     */
     public static boolean writeDataObject(String path, Map<String, Object> dataMap) {
         Yaml yaml = new Yaml();
         PrintWriter pw = null;
@@ -304,11 +379,17 @@ public class AclUtils {
         return true;
     }
 
+    /**
+     * 创建rpc调用钩子 读取yaml配置文件获取accessKey 和 secretKey
+     *
+     * @param fileName
+     * @return
+     */
     public static RPCHook getAclRPCHook(String fileName) {
         JSONObject yamlDataObject = null;
         try {
             yamlDataObject = AclUtils.getYamlDataObject(fileName,
-                JSONObject.class);
+                    JSONObject.class);
         } catch (Exception e) {
             log.error("Convert yaml file to data object error, ", e);
             return null;

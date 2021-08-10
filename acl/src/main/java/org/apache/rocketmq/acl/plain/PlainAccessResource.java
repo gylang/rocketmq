@@ -27,27 +27,28 @@ public class PlainAccessResource implements AccessResource {
     // Identify the user
     private String accessKey;
 
+    /** 秘钥/密码 */
     private String secretKey;
-
+    /** 远程地址 */
     private String whiteRemoteAddress;
-
+    /** 是否为管理员 */
     private boolean admin;
-
+    /** 默认topic权限 */
     private byte defaultTopicPerm = 1;
-
+    /** 默认组权限 */
     private byte defaultGroupPerm = 1;
-
+    /** 资源权限 */
     private Map<String, Byte> resourcePermMap;
-
+    /** 远程地址策略校验 白名单校验 */
     private RemoteAddressStrategy remoteAddressStrategy;
-
+   /** 请求码(命令 指令) */
     private int requestCode;
 
     // The content to calculate the content
     private byte[] content;
-
+    /** 签名值 */
     private String signature;
-
+    /** 秘钥token */
     private String secretToken;
 
     private String recognition;

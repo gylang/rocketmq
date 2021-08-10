@@ -24,12 +24,18 @@ import java.util.HashSet;
 import java.util.Set;
 import org.apache.rocketmq.common.consumer.ConsumeFromWhere;
 
+/** 消费者数据 */
 public class ConsumerData {
+    /** 订阅组 */
     private String groupName;
+    /** 消费方式 推/拉 */
     private ConsumeType consumeType;
+    /** 消息模式 broadcast / clustering */
     private MessageModel messageModel;
     private ConsumeFromWhere consumeFromWhere;
+    /** 订阅者信息 */
     private Set<SubscriptionData> subscriptionDataSet = new HashSet<SubscriptionData>();
+    /** 单一消费? */
     private boolean unitMode;
 
     public String getGroupName() {
