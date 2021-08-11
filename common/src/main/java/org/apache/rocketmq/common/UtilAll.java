@@ -87,6 +87,11 @@ public class UtilAll {
         return sb.toString();
     }
 
+    /**
+     * 20位整数字符串
+     * @param offset
+     * @return
+     */
     public static String offset2FileName(final long offset) {
         final NumberFormat nf = NumberFormat.getInstance();
         nf.setMinimumIntegerDigits(20);
